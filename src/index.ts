@@ -72,7 +72,7 @@ function makeImagePage(url: string, title: string): Response {
 		<div class="imgbox">
 			
 			<div style="text-align: center;">
-				<p>${title} <a href="${url}" download>Tải xuống</p>
+				<p>${title} <a href="${url}" download>Download</p>
 				
 			</div>
 			<br>
