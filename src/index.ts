@@ -32,7 +32,7 @@ const topPart = `<!DOCTYPE html>
 		<h1>Aperture's Dall-E Proxy</h1>
 		<br>
 		<p>
-		Write what you want to draw here, please don't write taboo things or don't abuse my account!!!
+		Write what you want to draw here, please don't write taboo things or abuse my account!!!
 		</p>
 		<br>
 		<form action="/" method="post">
