@@ -27,15 +27,25 @@ const topPart = `<!DOCTYPE html>
 	</style>
 </head>
 
-<body style="background-color:black;">
-	<h2>Aperture's Dall-E Proxy</h2>
-	
-	<form action="/" method="post">
-	<label for="prompt">Write what you want to draw here, don't write taboo thing and please don't abuse my account!!!</label><br>
-	<textarea id="prompt" name="prompt" rows="2" cols="50" placeholder="Enter a prompt here..."></textarea>
+<body style="background-color: black;">
+	<div style="text-align: center; margin-top: 25px;">
+		<h1>Aperture's Dall-E Proxy</h1>
+		<br>
+		<p>
+		Write what you want to draw here, please don't write taboo things or don't abuse my account!!!
+		</p>
+		<br>
+		<form action="/" method="post">
+			<input type="text" id="prompt" name="prompt" size="50" placeholder="Write your prompt here...">
+			<select name="size" id="size">
+				<option value="256x256">256x256</option>
+				<option value="512x512" selected="selected">512x512</option>
+				<option value="1024x1024">1024x1024</option>
+			</select>
+			<input type="submit" value="Submit">
+		</form>
+	</div>
 	<br>
-	<input type="submit" value="Submit">
-	</form>
 `
 const bottomPart = `
 </body>
@@ -56,11 +66,19 @@ function makeErrorPage(msg: any): Response {
 	});
 }
 
-function makeImagePage(url: string): Response {
+function makeImagePage(url: string, title: string): Response {
 	const imagePart = `
 
 		<div class="imgbox">
-			<img class="center-fit" src="${url}" alt="image">
+			
+			<div style="text-align: center;">
+				<p>${title} <a href="${url}" download>Tải xuống</p>
+				
+			</div>
+			<br>
+			<a class="center-fit" href="${url}">
+				<img src="${url}" alt="${title}" title="${title}">
+			</a>
 		</div>
 
 	`
@@ -77,15 +95,16 @@ export default {
 		env: Env,
 		ctx: ExecutionContext
 	): Promise<Response> {
-		if (request.method === 'GET') {
-			return makeImagePage("https://picsum.photos/512")
-		}
+		if (request.method === 'GET')
+			return makeImagePage("https://picsum.photos/512", "Lorem Picsum")
+		
 		const userRequest: any = await request.formData()
 
 		if (!userRequest.has("prompt")) {
 			return makeErrorPage("no prompt provided")
 		}
 		const prompt = userRequest.get("prompt")
+		const size = userRequest.get("size")
 		const response = await fetch("https://api.openai.com/v1/images/generations", {
 			method: "POST",
 			headers: {
@@ -94,6 +113,7 @@ export default {
 			},
 			body: JSON.stringify({
 				prompt: prompt,
+				size: size,
 				user: "Aperture's Proxy API"
 			})
 		})
@@ -101,6 +121,6 @@ export default {
 		
 		if (response.status !== 200)
 			return makeErrorPage(jsonResponse.error.message)
-		return makeImagePage(jsonResponse.data[0].url)
+		return makeImagePage(jsonResponse.data[0].url, prompt)
 	}
 }
